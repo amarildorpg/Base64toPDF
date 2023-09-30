@@ -263,7 +263,6 @@ object fInserirConexao: TfInserirConexao
     Width = 236
     Height = 23
     TabOrder = 3
-    Text = 'E4DA3B7FBBCE2345D7772B0674A318D5'
     OnExit = edPasswordExit
   end
   object edPorta: TEdit

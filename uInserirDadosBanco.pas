@@ -91,7 +91,6 @@ begin
         LtextoPdf64 := FConexao.sqlLabAtendimentoResultadoPdflab_atend_resul_pdf_base64.AsString;
         Base64ToPDF(LNome, LtextoPdf64);
         FConexao.sqlLabAtendimentoResultadoPdf.Next;
-        Sleep(1000);
       end;
       ShowMessage('Arquivos PDFs decodificado e salvos com sucesso');
     finally
