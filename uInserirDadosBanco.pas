@@ -3,8 +3,22 @@ unit uInserirDadosBanco;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,FireDAC.Comp.Client, Vcl.Buttons, Vcl.Mask, Vcl.ExtCtrls, uConexao, System.NetEncoding,
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.StdCtrls,
+  FireDAC.Comp.Client,
+  Vcl.Buttons,
+  Vcl.Mask,
+  Vcl.ExtCtrls,
+  uConexao,
+  System.NetEncoding,
   Data.DB;
 
 type
@@ -51,16 +65,16 @@ implementation
 
 procedure TfInserirConexao.Base64ToPDF( const FileName: string; Base64String: string);
 var
-  DecodedBytes: TBytes;
-  FileStream: TFileStream;
+  LDecodedBytes: TBytes;
+  LFileStream: TFileStream;
 begin
-  DecodedBytes := TNetEncoding.Base64.DecodeStringToBytes(Base64String);
+  LDecodedBytes := TNetEncoding.Base64.DecodeStringToBytes(Base64String);
   try
-    FileStream := TFileStream.Create(FileName, fmCreate);
+    LFileStream := TFileStream.Create(FileName, fmCreate);
     try
-      FileStream.WriteBuffer(DecodedBytes[0], Length(DecodedBytes));
+      LFileStream.WriteBuffer(LDecodedBytes[0], Length(LDecodedBytes));
     finally
-      FileStream.Free;
+      LFileStream.Free;
     end;
   except
     on E: Exception do
@@ -82,6 +96,7 @@ begin
     Abort;
   end;
   self.PreencherConexaoEditada();
+
   if (FConectado) and not(FSelectedFolder = '') then
   begin
     Base64 := TMemoField.Create(nil);
@@ -89,26 +104,21 @@ begin
       Offset := 0;
       while True do
       begin
-        // Utilize a cláusula SELECT com LIMIT e OFFSET
-        FConexao.sqlLabAtendimentoResultadoPdf.SQL.Text :=
-          'SELECT * FROM lab_atendimento_resultado_pdf LIMIT 100 OFFSET ' + IntToStr(Offset);
+        FConexao.sqlLabAtendimentoResultadoPdf.SQL.Text :='SELECT * FROM lab_atendimento_resultado_pdf LIMIT 100 OFFSET ' + IntToStr(Offset);
         FConexao.sqlLabAtendimentoResultadoPdf.Open();
 
-        // Sair do loop quando não houver mais registros
         if FConexao.sqlLabAtendimentoResultadoPdf.IsEmpty then
           Break;
 
         while not FConexao.sqlLabAtendimentoResultadoPdf.Eof do
         begin
-          LNome := edPastaPdf.Text + '\' + FConexao.sqlLabAtendimentoResultadoPdflab_atend_resul_pdf_id.AsString + '' + FConexao.sqlLabAtendimentoResultadoPdflab_atend_resul_pdf_nome.AsString;
+          LNome       := edPastaPdf.Text + '\' + FConexao.sqlLabAtendimentoResultadoPdflab_atend_resul_pdf_id.AsString + '' + FConexao.sqlLabAtendimentoResultadoPdflab_atend_resul_pdf_nome.AsString;
           LtextoPdf64 := FConexao.sqlLabAtendimentoResultadoPdflab_atend_resul_pdf_base64.AsString;
           Base64ToPDF(LNome, LtextoPdf64);
           FConexao.sqlLabAtendimentoResultadoPdf.Next;
         end;
-
-        Inc(Offset, 100); // Avance para o próximo conjunto de 100 registros
+        Inc(Offset, 100);
       end;
-
       ShowMessage('Arquivos PDFs decodificados e salvos com sucesso');
       FConexao.sqlLabAtendimentoResultadoPdf.Close;
       Application.Terminate;
@@ -117,8 +127,6 @@ begin
     end;
   end;
 end;
-
-
 
 procedure TfInserirConexao.edBancoExit(Sender: TObject);
 begin
@@ -174,15 +182,14 @@ procedure TfInserirConexao.PreencherConexaoEditada();
 begin
   FConectado := False;
   try
-    FConexao.dBanco.Params.Values['DriverID'] := 'MySQL';
-    FConexao.dBanco.Params.Values['Database'] := trim(edBanco.Text);
-    FConexao.dBanco.Params.Values['Server'] := trim(edHost.Text);
+    FConexao.dBanco.Params.Values['DriverID']  := 'MySQL';
+    FConexao.dBanco.Params.Values['Database']  := trim(edBanco.Text);
+    FConexao.dBanco.Params.Values['Server']    := trim(edHost.Text);
     FConexao.dBanco.Params.Values['User_Name'] := trim(edUsername.Text);
-    FConexao.dBanco.Params.Values['Password'] := trim(edPassword.Text);
-    FConexao.dBanco.Params.Values['Port'] := trim(edPorta.Text);
-    FConexao.dBanco.Connected := True;
-    FConexao.dBanco.Open();
-    FConectado := True;
+    FConexao.dBanco.Params.Values['Password']  := trim(edPassword.Text);
+    FConexao.dBanco.Params.Values['Port']      := trim(edPorta.Text);
+    FConexao.dBanco.Connected                  := True;
+    FConectado                                 := True;
   except
     on E:Exception do
     begin
@@ -195,19 +202,19 @@ end;
 
 procedure TfInserirConexao.SpeedButton1Click(Sender: TObject);
 var
-  folderDialog: TFileOpenDialog;
+  LfolderDialog: TFileOpenDialog;
 begin
-  folderDialog := TFileOpenDialog.Create(nil);
+  LfolderDialog := TFileOpenDialog.Create(nil);
   try
-    folderDialog.Options := [fdoPickFolders];
-    folderDialog.Title := 'Selecione uma pasta';
-    if folderDialog.Execute then
+    LfolderDialog.Options := [fdoPickFolders];
+    LfolderDialog.Title := 'Selecione uma pasta';
+    if LfolderDialog.Execute then
     begin
-      FSelectedFolder := folderDialog.FileName;
+      FSelectedFolder := LfolderDialog.FileName;
       edPastaPdf.Text :=  FSelectedFolder;
     end;
   finally
-    folderDialog.Free;
+    LfolderDialog.Free;
   end;
 end;
 
