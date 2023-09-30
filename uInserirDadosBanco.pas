@@ -110,6 +110,8 @@ begin
       end;
 
       ShowMessage('Arquivos PDFs decodificados e salvos com sucesso');
+      FConexao.sqlLabAtendimentoResultadoPdf.Close;
+      Application.Terminate;
     finally
       FreeAndNil(Base64);
     end;
