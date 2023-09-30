@@ -71,32 +71,52 @@ end;
 
 procedure TfInserirConexao.btExportarClick(Sender: TObject);
 var
- LtextoPdf64: string;
- Base64: TMemoField;
- LNome: String;
+  LtextoPdf64: string;
+  Base64: TMemoField;
+  LNome: String;
+  Offset: Integer;
 begin
   if edPastaPdf.Text = '' then
   begin
     ShowMessage('Insira um caminho para salvar os PDFs para Continuar');
-    abort;
+    Abort;
   end;
- self.PreencherConexaoEditada();
- if (FConectado) and not(FSelectedFolder = '') then
+  self.PreencherConexaoEditada();
+  if (FConectado) and not(FSelectedFolder = '') then
+  begin
     Base64 := TMemoField.Create(nil);
     try
-      FConexao.sqlLabAtendimentoResultadoPdf.Open();
-      while not FConexao.sqlLabAtendimentoResultadoPdf.eof do
+      Offset := 0;
+      while True do
       begin
-        LNome := edPastaPdf.Text + '\' +FConexao.sqlLabAtendimentoResultadoPdflab_atend_resul_pdf_id.AsString + '' + FConexao.sqlLabAtendimentoResultadoPdflab_atend_resul_pdf_nome.AsString + '.pdf';
-        LtextoPdf64 := FConexao.sqlLabAtendimentoResultadoPdflab_atend_resul_pdf_base64.AsString;
-        Base64ToPDF(LNome, LtextoPdf64);
-        FConexao.sqlLabAtendimentoResultadoPdf.Next;
+        // Utilize a cláusula SELECT com LIMIT e OFFSET
+        FConexao.sqlLabAtendimentoResultadoPdf.SQL.Text :=
+          'SELECT * FROM lab_atendimento_resultado_pdf LIMIT 100 OFFSET ' + IntToStr(Offset);
+        FConexao.sqlLabAtendimentoResultadoPdf.Open();
+
+        // Sair do loop quando não houver mais registros
+        if FConexao.sqlLabAtendimentoResultadoPdf.IsEmpty then
+          Break;
+
+        while not FConexao.sqlLabAtendimentoResultadoPdf.Eof do
+        begin
+          LNome := edPastaPdf.Text + '\' + FConexao.sqlLabAtendimentoResultadoPdflab_atend_resul_pdf_id.AsString + '' + FConexao.sqlLabAtendimentoResultadoPdflab_atend_resul_pdf_nome.AsString + '.pdf';
+          LtextoPdf64 := FConexao.sqlLabAtendimentoResultadoPdflab_atend_resul_pdf_base64.AsString;
+          Base64ToPDF(LNome, LtextoPdf64);
+          FConexao.sqlLabAtendimentoResultadoPdf.Next;
+        end;
+
+        Inc(Offset, 100); // Avance para o próximo conjunto de 100 registros
       end;
-      ShowMessage('Arquivos PDFs decodificado e salvos com sucesso');
+
+      ShowMessage('Arquivos PDFs decodificados e salvos com sucesso');
     finally
       FreeAndNil(Base64);
     end;
+  end;
 end;
+
+
 
 procedure TfInserirConexao.edBancoExit(Sender: TObject);
 begin
@@ -153,11 +173,11 @@ begin
   FConectado := False;
   try
     FConexao.dBanco.Params.Values['DriverID'] := 'MySQL';
-    FConexao.dBanco.Params.Values['Database'] := edBanco.Text;
-    FConexao.dBanco.Params.Values['Server'] := edHost.Text;
-    FConexao.dBanco.Params.Values['UserName'] := edUsername.Text;
-    FConexao.dBanco.Params.Values['Password'] := edPassword.Text;
-    FConexao.dBanco.Params.Values['Porta'] := edPorta.Text;
+    FConexao.dBanco.Params.Values['Database'] := trim(edBanco.Text);
+    FConexao.dBanco.Params.Values['Server'] := trim(edHost.Text);
+    FConexao.dBanco.Params.Values['User_Name'] := trim(edUsername.Text);
+    FConexao.dBanco.Params.Values['Password'] := trim(edPassword.Text);
+    FConexao.dBanco.Params.Values['Port'] := trim(edPorta.Text);
     FConexao.dBanco.Connected := True;
     FConexao.dBanco.Open();
     FConectado := True;

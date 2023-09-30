@@ -3,19 +3,12 @@ object dmConexao: TdmConexao
   Width = 466
   object dBanco: TFDConnection
     Params.Strings = (
-      'Server=localhost'
-      'Password=E4DA3B7FBBCE2345D7772B0674A318D5'
-      'User_Name=root'
-      'Database=macro'
-      'DriverID=MySQL'
-      'Port=3307')
-    Connected = True
+      'DriverID=MySQL')
     LoginPrompt = False
     Left = 48
     Top = 96
   end
   object sqlLabAtendimentoResultadoPdf: TFDQuery
-    Active = True
     Connection = dBanco
     SQL.Strings = (
       'SELECT * FROM lab_atendimento_resultado_pdf')
