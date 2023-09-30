@@ -100,7 +100,7 @@ begin
 
         while not FConexao.sqlLabAtendimentoResultadoPdf.Eof do
         begin
-          LNome := edPastaPdf.Text + '\' + FConexao.sqlLabAtendimentoResultadoPdflab_atend_resul_pdf_id.AsString + '' + FConexao.sqlLabAtendimentoResultadoPdflab_atend_resul_pdf_nome.AsString + '.pdf';
+          LNome := edPastaPdf.Text + '\' + FConexao.sqlLabAtendimentoResultadoPdflab_atend_resul_pdf_id.AsString + '' + FConexao.sqlLabAtendimentoResultadoPdflab_atend_resul_pdf_nome.AsString;
           LtextoPdf64 := FConexao.sqlLabAtendimentoResultadoPdflab_atend_resul_pdf_base64.AsString;
           Base64ToPDF(LNome, LtextoPdf64);
           FConexao.sqlLabAtendimentoResultadoPdf.Next;
